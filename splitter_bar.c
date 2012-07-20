@@ -164,7 +164,7 @@ void update_output(int nc) {
 }
 
 void update_right() {
-    unsigned int text_length=0, p_length, q=0, n;
+    unsigned int text_length=0, p_length, q=0, n, where_start;
     char bstring[256];
     char *root_name;
     m=0;
@@ -199,7 +199,8 @@ void update_right() {
         print_right_text();
     }
 
-    XCopyArea(dis, winbar, barwin, theme[1].gc, old_textstart, 0, width-old_textstart, height, old_textstart, 0);
+    where_start = (text_start > old_textstart) ? old_textstart : text_start;
+    XCopyArea(dis, winbar, barwin, theme[1].gc, where_start, 0, width-where_start, height, where_start, 0);
     for(n=0;n<256;n++)
         right[n] ='\0';
     XSync(dis, False);
