@@ -29,7 +29,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#define TOP_BAR 0        // 0=Bar at top, 1=Bar at bottom
+#define TOP_BAR 1        // 0=Bar at top, 1=Bar at bottom
 #define BAR_HEIGHT 16
 #define BAR_WIDTH 0      // 0=Full width or use num pixels
 // If font isn't found "fixed" will be used
@@ -199,7 +199,7 @@ void update_right() {
         print_right_text();
     }
 
-    XCopyArea(dis, winbar, barwin, theme[1].gc, text_start, 0, width-text_start, height, text_start, 0);
+    XCopyArea(dis, winbar, barwin, theme[1].gc, old_textstart, 0, width-old_textstart, height, old_textstart, 0);
     for(n=0;n<256;n++)
         right[n] ='\0';
     XSync(dis, False);

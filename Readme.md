@@ -5,6 +5,7 @@ Pipe monsterwm into splitter_bar to have it's output shown on the left.
 
 Set the root windows' name with conky or a script and that will be shown on the right.
 
+e.g. conky | while read -r; do xsetroot -name "$REPLY"; done &
 
 ###The nine colours are set at compile time so edit them to suit.
 
