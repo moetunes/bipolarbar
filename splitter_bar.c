@@ -29,7 +29,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#define TOP_BAR 1        // 0=Bar at top, 1=Bar at bottom
+#define TOP_BAR 0        // 0=Bar at top, 1=Bar at bottom
 #define BAR_HEIGHT 16
 #define BAR_WIDTH 0      // 0=Full width or use num pixels
 // If font isn't found "fixed" will be used
@@ -193,6 +193,7 @@ void update_right() {
     bstring[q] = '\0';
     p_length = wc_size(bstring, q);
     text_start = width - p_length;
+    if(old_textstart < old_length) old_textstart = old_length;
     XFillRectangle(dis, winbar, theme[0].gc, old_textstart, 0, width-old_textstart, height);
     // i=pos on screen q=pos in text
     for(counted=0;counted<text_length;counted++) {
