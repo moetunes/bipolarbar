@@ -184,7 +184,7 @@ void update_right() {
     //printf("TEXT= %s\n", right);
     for(n=0;n<text_length;n++) {
         while(right[n] == '&') {
-            if(right[n+1]-'0' < 7 && right[n+1]-'0' > 0) {
+            if(right[n+1]-'0' < 10 && right[n+1]-'0' > 0) {
                 n += 2;
             } else break;
         }
