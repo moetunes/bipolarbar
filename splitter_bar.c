@@ -29,21 +29,23 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+/***************** DEFINES ***********************/
 #define TOP_BAR 0        // 0=Bar at top, 1=Bar at bottom
 #define BAR_HEIGHT 16
 #define BAR_WIDTH 0      // 0=Full width or use num pixels
 // If font isn't found "fixed" will be used
 #define FONT "-*-terminusmod.icons-medium-r-*-*-12-*-*-*-*-*-*-*,-*-stlarch-medium-r-*-*-12-*-*-*-*-*-*-*"
 #define FONTS_ERROR 1      // 0 to have missing fonts error shown
-// colours are background then eight for the text
-#define colour1 "#003040"  // Background colour. The rest colour the text
-#define colour2 "#dddddd"  // &2
-#define colour3 "#669921"
-#define colour4 "#00dd99"
-#define colour5 "#ffffff"
-#define colour6 "#ffff00"
-#define colour7 "#ff00ff"
-#define colour8 "#f0f0f0"
+// colours are for background and the text
+#define colour0 "#003040"  // &0 Default Background colour
+#define colour1 "#ffffff"   // &1 Default foreground colour
+#define colour2 "#006080"  // &2
+#define colour3 "#0080a0"
+#define colour4 "#00ff00"
+#define colour5 "#664422"
+#define colour6 "#886644"
+#define colour7 "#aa8866"
+#define colour8 "#8888ff"
 #define colour9 "#ff0000"  // &9
 
 typedef struct {
@@ -68,12 +70,12 @@ static void print_text();
 static void print_right_text();
 static int wc_size(char *string, int num);
 
-static const char *defaultcolor[] = { colour1, colour2, colour3, colour4, colour5, colour6, colour7, colour8, colour9, };
+static const char *defaultcolor[] = { colour0, colour1, colour2, colour3, colour4, colour5, colour6, colour7, colour8, colour9, };
 static const char *font_list = FONT;
 
-static unsigned int count, counted, j, k, m;
-static unsigned int text_length, text_start;
-static unsigned int old_length, old_textstart;
+static unsigned int count, counted, j, k, m, bg;
+static unsigned int text_length, text_start, new_length;
+static unsigned int old_length;
 static char output[256] = {"splitter_Bar "};
 static char right[256] = {"You're ad here "};
 
@@ -127,32 +129,36 @@ void get_font() {
 	font.height = font.ascent + font.descent;
 }
 
-void update_output(int nc) {
-    j=2; k=0;
+void update_output() {
+    j=1; k=0; bg = 0;
     text_length = 0;
-    unsigned int n, new_length;
+    unsigned int n;
     ssize_t num;
     char win_name[256];
 
     for(k=0;k<257;k++)
         output[k] = '\0';
-    if(nc < 1) {
-        if(!(num = read(STDIN_FILENO, output, sizeof(output)))) {
-            fprintf(stderr, "Splitter_bar :: FAILED TO READ STDIN!!\n");
-            strncpy(output, "FAILED TO READ STDIN!!", 24);
-            exit(1);
-        }
+    if(!(num = read(STDIN_FILENO, output, sizeof(output)))) {
+        fprintf(stderr, "Splitter_bar :: FAILED TO READ STDIN!!\n");
+        strncpy(output, "FAILED TO READ STDIN!!", 24);
+        exit(1);
     }
+
     count = 0; k = 0;
     text_length = strlen(output);
     for(n=0;n<=text_length;n++) {
-        while(output[n] == '&' && output[n+1]-'0' < 10 && output[n+1]-'0' > 0) n += 2;
-        //if(output[n] == '\n' || output[n] == '\r') break;
+        while(output[n] == '&') {
+            if(output[n+1]-'0' < 10 && output[n+1]-'0' >= 0)
+                n += 2;
+            if(output[n+1] == 'B' && output[n+2]-'0' < 10 && output[n+2]-'0' >= 0)
+                n += 3;
+        }
+        if(output[n] == '\n' || output[n] == '\r') break;
         win_name[count] = output[n];
         count++;
     }
     win_name[count+1] = '\0';
-    new_length = wc_size(win_name, count+1);
+    new_length = wc_size(win_name, count);
     XFillRectangle(dis, winbar, theme[0].gc, 0, 0, old_length, height);
     for(count=0;count<=text_length;count++) {
         print_text();
@@ -164,66 +170,74 @@ void update_output(int nc) {
 }
 
 void update_right() {
-    unsigned int text_length=0, p_length, q=0, n, where_start;
+    unsigned int text_l=0, p_length, q=0, n;
     char bstring[256];
     char *root_name;
-    m=0;
+    j=1;m=0; bg = 0;
 
     if(!(XFetchName(dis, root, &root_name))) {
         strcpy(right, "&3splitter_bar ");
-        text_length = 14;
+        text_l = 14;
     } else {
-        while(root_name[text_length] != '\0' && text_length < 256) {
-            right[text_length] = root_name[text_length];
-            text_length++;
+        while(root_name[text_l] != '\0' && text_l < 256) {
+            right[text_l] = root_name[text_l];
+            text_l++;
         }
-        right[text_length] = '\0';
+        right[text_l] = '\0';
     }
     XFree(root_name);
 
-    //printf("TEXT= %s\n", right);
-    for(n=0;n<text_length;n++) {
-        while(right[n] == '&') {
-            if(right[n+1]-'0' < 10 && right[n+1]-'0' > 0) {
-                n += 2;
-            } else break;
-        }
-        bstring[q] = right[n]; q++;
-    }
-    bstring[q] = '\0';
-    p_length = wc_size(bstring, q);
-    text_start = width - p_length;
-    if(old_textstart < old_length) old_textstart = old_length;
-    XFillRectangle(dis, winbar, theme[0].gc, old_textstart, 0, width-old_textstart, height);
+    XFillRectangle(dis, winbar, theme[0].gc, old_length, 0, width-old_length, height);
+    text_start = old_length;
     // i=pos on screen q=pos in text
-    for(counted=0;counted<text_length;counted++) {
+    for(counted=0;counted<=text_l;counted++) {
+        if(right[counted] == '&' && (right[counted+1] == 'C' || right[counted+1] == 'R')) {
+            counted += 2; q=0; m=0;
+            for(n=counted;n<text_l;n++) {
+                while(right[n] == '&') {
+                    if(right[n+1]-'0' < 10 && right[n+1]-'0' >= 0) {
+                        n += 2;
+                    } else if(right[n+1] == 'B' && right[n+2]-'0' < 10 && right[n+2]-'0' >= 0) {
+                        n += 3;
+                    } else if(right[n+1] == 'R') {
+                        break;
+                    } else break;
+                }
+                bstring[q] = right[n]; q++;
+            }
+            bstring[q] = '\0';
+            p_length = wc_size(bstring, q);
+            if(right[counted-1] == 'C')
+                text_start = (width/2)-(p_length/2)+old_length;
+            if(right[counted-1] == 'R')
+                text_start = width-p_length;
+        }
         print_right_text();
     }
 
-    where_start = (text_start > old_textstart) ? old_textstart : text_start;
-    XCopyArea(dis, winbar, barwin, theme[1].gc, where_start, 0, width-where_start, height, where_start, 0);
+    XCopyArea(dis, winbar, barwin, theme[1].gc, old_length, 0, width-old_length, height, old_length, 0);
     for(n=0;n<256;n++)
         right[n] ='\0';
     XSync(dis, False);
-    old_textstart = text_start;
     return;
 }
 
 void print_right_text() {
     char bstring[256];
-    unsigned int wsize, breaker=0, n=0;
+    unsigned int wsize, n=0;
 
     while(right[counted] == '&') {
-        if(right[counted+1]-'0' < 10 && right[counted+1]-'0' > 0) {
-            j = right[counted+1]-'0';
-            if(j > 1 || j < 10) {
-                 j--;
-            } else  j = 2;
-            counted += 2;
-        } else {
-            breaker = 1;
+        if(right[counted+1] == 'C' || right[counted+1] == 'R') {
+            counted--;
+            break;
         }
-        if(breaker == 1) break;
+        if(right[counted+1]-'0' < 10 && right[counted+1]-'0' >= 0) {
+            j = right[counted+1]-'0';
+            counted += 2;
+        } else if(right[counted+1] == 'B' && right[counted+2]-'0' < 10 && right[counted+2]-'0' >= 0) {
+            bg = right[counted+2]-'0';
+            counted += 3;
+        } else break;
     }
     if(right[counted] == '&') {
         bstring[n] = right[counted];
@@ -236,10 +250,11 @@ void print_right_text() {
     if(n < 1) return;
     bstring[n] = '\0';
     wsize = wc_size(bstring, n);
+    XFillRectangle(dis, winbar, theme[bg].gc, text_start+m, 0, wsize, height);
     if(font.fontset)
-        XmbDrawImageString(dis, winbar, font.fontset, theme[j].gc, text_start+m, font.fh, bstring, n);
+        XmbDrawString(dis, winbar, font.fontset, theme[j].gc, text_start+m, font.fh, bstring, n);
     else
-        XDrawImageString(dis, winbar, theme[j].gc, text_start+m, font.fh, bstring, n);
+        XDrawString(dis, winbar, theme[j].gc, text_start+m, font.fh, bstring, n);
     m += wsize;
     for(n=0;n<256;n++)
         bstring[n] = '\0';
@@ -248,19 +263,16 @@ void print_right_text() {
 
 void print_text() {
     char astring[256];
-    unsigned int wsize, breaker=0, n=0;
+    unsigned int wsize, n=0;
 
     while(output[count] == '&') {
-        if(output[count+1]-'0' < 10 && output[count+1]-'0' > 0) {
+        if(output[count+1]-'0' < 10 && output[count+1]-'0' >= 0) {
             j = output[count+1]-'0';
-            if(j > 1 || j < 10) {
-                 j--;
-            } else  j = 2;
             count += 2;
-        } else {
-            breaker = 1;
-        }
-        if(breaker == 1) break;
+        } else if(output[count+1] == 'B' && output[count+2]-'0' < 10 && output[count+2]-'0' >= 0) {
+            bg = output[count+2]-'0';
+            count += 3;
+        } else break;
     }
     if(output[count] == '&') {
         astring[n] = output[count];
@@ -273,10 +285,11 @@ void print_text() {
     if(n < 1) return;
     astring[n] = '\0';
     wsize = wc_size(astring, n);
+    XFillRectangle(dis, winbar, theme[bg].gc, k, 0, wsize, height);
     if(font.fontset)
-        XmbDrawImageString(dis, winbar, font.fontset, theme[j].gc, k, font.fh, astring, n);
+        XmbDrawString(dis, winbar, font.fontset, theme[j].gc, k, font.fh, astring, n);
     else
-        XDrawImageString(dis, winbar, theme[j].gc, k, font.fh, astring, n);
+        XDrawString(dis, winbar, theme[j].gc, k, font.fh, astring, n);
     k += wsize;
     for(n=0;n<256;n++)
         astring[n] = '\0';
@@ -333,7 +346,7 @@ int main(int argc, char ** argv){
         theme[i].color = getcolor(defaultcolor[i]);
     XGCValues values;
 
-    for(i=0;i<9;i++) {
+    for(i=0;i<10;i++) {
         values.background = theme[0].color;
         values.foreground = theme[i].color;
         values.line_width = 2;
@@ -345,7 +358,7 @@ int main(int argc, char ** argv){
             theme[i].gc = XCreateGC(dis, root, GCBackground|GCForeground|GCLineWidth|GCLineStyle|GCFont,&values);
         }
     }
-    old_length = 0; old_textstart = 0;
+    old_length = 0;
 
     winbar = XCreatePixmap(dis, root, width, height, DefaultDepth(dis, screen));
     XFillRectangle(dis, winbar, theme[0].gc, 0, 0, width, height);
@@ -366,12 +379,12 @@ int main(int argc, char ** argv){
         select(x11_fd+1, &readfds, NULL, NULL, &tv);
 
     	if (FD_ISSET(STDIN_FILENO, &readfds))
-    	    update_output(0);
+    	    update_output();
         while(XPending(dis) != 0) {
             XNextEvent(dis, &ev);
             switch(ev.type){
                 case Expose:
-                    XCopyArea(dis, winbar, barwin, theme[1].gc, 0, 0, width, height, 1, 0);
+                    XCopyArea(dis, winbar, barwin, theme[1].gc, 0, 0, width, height, 0, 0);
                     XSync(dis, False);
                     break;
                 case PropertyNotify:

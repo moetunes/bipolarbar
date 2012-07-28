@@ -3,19 +3,35 @@
 
 Pipe monsterwm into splitter_bar to have it's output shown on the left.
 
-Set the root windows' name with conky or a script and that will be shown on the right.
+Set the root windows' name with conky or a script
 
 e.g. conky | while read -r; do xsetroot -name "$REPLY"; done &
 
-###The nine colours are set at compile time so edit them to suit.
+###The ten colours are set at compile time so edit them to suit.
+###All ten colours can be used for the background or text.
 
-The first colour is the background and the second to ninth are for the text.
+The first colour (colour0) is the default background and the second colour
+is the default for the text, for both the piped in text and the text from xsetroot -name.
 
-To change the colour mark the text with an ampersand and the desired colour number.
+To change the text colour mark the text with an ampersand and the desired colour number.
 
 *e.g.* To use the second and last colours, mark the text like -
 
 ** *&2* some text *&9* some more text**
+
+To change the background colour mark the text with an ampersand and a capital B and the colour number.
+
+*e.g.* To use the second and last colours, mark the text like -
+
+** *&2* some text *&B2&9* some more text**
+
+The text defaults to the right of the piped in text (monsterwm's text)
+but can be set centered or on the right with &C and &R, which can't be
+preceeded by a background or text colour.
+
+*e.g.* To have some text next to the piped in text and some on the right
+
+** *&2* some text *&R&B3&9* some right text**
 
 Whether the bar is at *top or bottom* is set at compile time.
 

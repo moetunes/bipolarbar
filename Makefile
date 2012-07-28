@@ -11,7 +11,7 @@ CC=gcc
 all: $(EXEC)
 
 splitter_bar: splitter_bar.o
-	$(CC) $(LDFLAGS) -s -O2 -o $@ $+ $(LDADD)
+	$(CC) $(LDFLAGS) -s -Os -o $@ $+ $(LDADD)
 
 install: all
 	install -Dm 755 splitter_bar $(DESTDIR)$(BINDIR)/splitter_bar
