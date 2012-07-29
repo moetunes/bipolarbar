@@ -17,13 +17,13 @@ To change the text colour mark the text with an ampersand and the desired colour
 
 *e.g.* To use the second and last colours, mark the text like -
 
-** *&2* some text *&9* some more text**
+** *&1* some text *&9* some more text**
 
 To change the background colour mark the text with an ampersand and a capital B and the colour number.
 
-*e.g.* To use the second and last colours, mark the text like -
+*e.g.* To use the second and last colours, and change the background mark the text like -
 
-** *&2* some text *&B2&9* some more text**
+** *&1* some text *&B2&9* some more text**
 
 The text defaults to the right of the piped in text (monsterwm's text)
 but can be set centered or on the right with &C and &R, which can't be
