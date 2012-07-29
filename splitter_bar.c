@@ -157,7 +157,6 @@ void update_output() {
         win_name[count] = output[n];
         count++;
     }
-    win_name[count+1] = '\0';
     new_length = wc_size(win_name, count);
     XFillRectangle(dis, winbar, theme[0].gc, 0, 0, old_length, height);
     for(count=0;count<=text_length;count++) {
@@ -256,8 +255,8 @@ void print_right_text() {
     else
         XDrawString(dis, winbar, theme[j].gc, text_start+m, font.fh, bstring, n);
     m += wsize;
-    for(n=0;n<256;n++)
-        bstring[n] = '\0';
+    for(wsize=0;wsize<n;wsize++)
+        bstring[wsize] = '\0';
     counted--;
 }
 
@@ -291,8 +290,8 @@ void print_text() {
     else
         XDrawString(dis, winbar, theme[j].gc, k, font.fh, astring, n);
     k += wsize;
-    for(n=0;n<256;n++)
-        astring[n] = '\0';
+    for(wsize=0;wsize<n;wsize++)
+        astring[wsize] = '\0';
     count--;
 }
 
