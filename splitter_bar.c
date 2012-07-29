@@ -162,7 +162,7 @@ void update_output() {
     for(count=0;count<=text_length;count++) {
         print_text();
     }
-    XCopyArea(dis, winbar, barwin, theme[1].gc, 0, 0, new_length, height, 1, 0);
+    XCopyArea(dis, winbar, barwin, theme[1].gc, 0, 0, new_length, height, 0, 0);
     XSync(dis, False);
     old_length = new_length;
     return;
@@ -187,7 +187,7 @@ void update_right() {
     XFree(root_name);
 
     XFillRectangle(dis, winbar, theme[0].gc, old_length, 0, width-old_length, height);
-    text_start = old_length;
+    text_start = old_length+font.width;
     // i=pos on screen q=pos in text
     for(counted=0;counted<=text_l;counted++) {
         if(right[counted] == '&' && (right[counted+1] == 'C' || right[counted+1] == 'R')) {
