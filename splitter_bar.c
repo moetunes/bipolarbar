@@ -346,7 +346,6 @@ int main(int argc, char ** argv){
     XGCValues values;
 
     for(i=0;i<10;i++) {
-        values.background = theme[0].color;
         values.foreground = theme[i].color;
         values.line_width = 2;
         values.line_style = LineSolid;
