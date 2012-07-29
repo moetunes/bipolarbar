@@ -80,7 +80,6 @@ static char output[256] = {"splitter_Bar "};
 static char right[256] = {"You're ad here "};
 
 static Display *dis;
-static unsigned int first_run;
 static unsigned int sw;
 static unsigned int sh;
 static unsigned int height;
@@ -360,13 +359,12 @@ int main(int argc, char ** argv){
 
     winbar = XCreatePixmap(dis, root, width, height, DefaultDepth(dis, screen));
     XFillRectangle(dis, winbar, theme[0].gc, 0, 0, width, height);
-    barwin = XCreateSimpleWindow(dis, root, 0, y, width, height, 1, theme[0].color,theme[0].color);
+    barwin = XCreateSimpleWindow(dis, root, 0, y, width, height, 0, theme[0].color,theme[0].color);
     attr.override_redirect = True;
     XChangeWindowAttributes(dis, barwin, CWOverrideRedirect, &attr);
     XSelectInput(dis,barwin,ExposureMask);
     XSelectInput(dis,root,PropertyChangeMask);
     XMapWindow(dis, barwin);
-    first_run = 0;
     int x11_fd = ConnectionNumber(dis);
     while(1){
        	FD_ZERO(&readfds);
