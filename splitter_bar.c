@@ -30,7 +30,7 @@
 #include <unistd.h>
 
 /***************** DEFINES ***********************/
-#define TOP_BAR 0        // 0=Bar at top, 1=Bar at bottom
+#define TOP_BAR 1        // 0=Bar at top, 1=Bar at bottom
 #define BAR_HEIGHT 16
 #define BAR_WIDTH 0      // 0=Full width or use num pixels
 // If font isn't found "fixed" will be used
@@ -337,10 +337,10 @@ int main(int argc, char ** argv){
     get_font();
     height = (BAR_HEIGHT > font.height) ? BAR_HEIGHT : font.height+2;
     font.fh = ((height - font.height)/2) + font.ascent;
-    width = (BAR_WIDTH == 0) ? sw-2 : BAR_WIDTH-2; // Take off border width
-    if (TOP_BAR != 0) y = sh - height-2; // Take off border width
+    width = (BAR_WIDTH == 0) ? sw : BAR_WIDTH;
+    if (TOP_BAR != 0) y = sh - height;
 
-    for(i=0;i<9;i++)
+    for(i=0;i<10;i++)
         theme[i].color = getcolor(defaultcolor[i]);
     XGCValues values;
 
