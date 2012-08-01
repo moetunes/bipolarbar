@@ -31,7 +31,7 @@
 
 /***************** DEFINES ***********************/
 #define TOP_BAR 1        // 0=Bar at top, 1=Bar at bottom
-#define BAR_HEIGHT 16
+#define BAR_HEIGHT 18
 #define BAR_WIDTH 0      // 0=Full width or use num pixels
 // If font isn't found "fixed" will be used
 #define FONT "-*-terminusmod.icons-medium-r-*-*-12-*-*-*-*-*-*-*,-*-stlarch-medium-r-*-*-12-*-*-*-*-*-*-*"
@@ -349,10 +349,10 @@ int main(int argc, char ** argv){
         values.line_width = 2;
         values.line_style = LineSolid;
         if(font.fontset) {
-            theme[i].gc = XCreateGC(dis, root, GCBackground|GCForeground|GCLineWidth|GCLineStyle,&values);
+            theme[i].gc = XCreateGC(dis, root, GCForeground|GCLineWidth|GCLineStyle,&values);
         } else {
             values.font = font.font->fid;
-            theme[i].gc = XCreateGC(dis, root, GCBackground|GCForeground|GCLineWidth|GCLineStyle|GCFont,&values);
+            theme[i].gc = XCreateGC(dis, root, GCForeground|GCLineWidth|GCLineStyle|GCFont,&values);
         }
     }
     old_length = 0;

@@ -1,14 +1,17 @@
 ##splitter_bar
-####Aimed at, but not limited to, monsterwm users
+###Aimed at, but not limited to, monsterwm users.
+
+The bar can show two sets of information with different timings. e.g.
 
 Pipe monsterwm into splitter_bar to have it's output shown on the left.
 
-Set the root windows' name with conky or a script
+Set the root windows' name with conky or a script and it will be
+ shown on th rest of the bar.
 
 e.g. conky | while read -r; do xsetroot -name "$REPLY"; done &
 
-###The ten colours are set at compile time so edit them to suit.
-###All ten colours can be used for the background or text.
+####The ten colours are set at compile time so edit them to suit.
+####All ten colours can be used for the background or text.
 
 The first colour (colour0) is the default background and the second colour
 is the default for the text, for both the piped in text and the text from xsetroot -name.
