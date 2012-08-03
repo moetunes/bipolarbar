@@ -1,7 +1,7 @@
 CFLAGS+= -Wall
 LDADD+= -lX11
 LDFLAGS=
-EXEC=splitter_bar
+EXEC=bipolarbar
 
 PREFIX?= /usr/local
 BINDIR?= $(PREFIX)/bin
@@ -10,12 +10,12 @@ CC=gcc
 
 all: $(EXEC)
 
-splitter_bar: splitter_bar.o
+bipolarbar: bipolarbar.o
 	$(CC) $(LDFLAGS) -s -Os -o $@ $+ $(LDADD)
 
 install: all
-	install -Dm 755 splitter_bar $(DESTDIR)$(BINDIR)/splitter_bar
+	install -Dm 755 bipolarbar $(DESTDIR)$(BINDIR)/bipolarbar
 
 clean:
-	rm -fv splitter_bar *.o
+	rm -fv bipolarbar *.o
 

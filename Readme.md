@@ -1,12 +1,12 @@
-##splitter_bar
+##bipolarbar
 ###Aimed at, but not limited to, monsterwm users.
 
 The bar can show two sets of information with different timings. e.g.
 
-Pipe monsterwm into splitter_bar to have it's output shown on the left.
+Pipe monsterwm into bipolarbar to have it's output shown on the left.
 
 Set the root windows' name with conky or a script and it will be
- shown on th rest of the bar.
+ shown on the rest of the bar.
 
 e.g. conky | while read -r; do xsetroot -name "$REPLY"; done &
 

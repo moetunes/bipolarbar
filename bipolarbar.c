@@ -1,4 +1,4 @@
-/* splitter_bar.c
+/* bipolarbar.c
 *
 *  This program is free software: you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -30,23 +30,23 @@
 #include <unistd.h>
 
 /***************** DEFINES ***********************/
-#define TOP_BAR 1        // 0=Bar at top, 1=Bar at bottom
+#define TOP_BAR 0        // 0=Bar at top, 1=Bar at bottom
 #define BAR_HEIGHT 18
 #define BAR_WIDTH 0      // 0=Full width or use num pixels
 // If font isn't found "fixed" will be used
 #define FONT "-*-terminusmod.icons-medium-r-*-*-12-*-*-*-*-*-*-*,-*-stlarch-medium-r-*-*-12-*-*-*-*-*-*-*"
 #define FONTS_ERROR 1      // 0 to have missing fonts error shown
 // colours are for background and the text
-#define colour0 "#003040"  // &0 Default Background colour
+#define colour0 "#001020"  // &0 Default Background colour
 #define colour1 "#ffffff"   // &1 Default foreground colour
-#define colour2 "#006080"  // &2
-#define colour3 "#0080a0"
-#define colour4 "#00ff00"
-#define colour5 "#664422"
-#define colour6 "#886644"
-#define colour7 "#aa8866"
-#define colour8 "#8888ff"
-#define colour9 "#ff0000"  // &9
+#define colour2 "#002030"  // &2
+#define colour3 "#665522"
+#define colour4 "#898900"
+#define colour5 "#776644"
+#define colour6 "#887733"
+#define colour7 "#998866"
+#define colour8 "#999999"
+#define colour9 "#000055"  // &9
 
 typedef struct {
     unsigned long color;
@@ -76,7 +76,7 @@ static const char *font_list = FONT;
 static unsigned int count, counted, j, k, m, bg;
 static unsigned int text_length, text_start, new_length;
 static unsigned int old_length;
-static char output[256] = {"splitter_Bar "};
+static char output[256] = {"bipolarBar "};
 static char right[256] = {"You're ad here "};
 
 static Display *dis;
@@ -101,7 +101,7 @@ void get_font() {
 	if(missing) {
 		if(FONTS_ERROR < 1)
             while(n--)
-                fprintf(stderr, ":: Splitter_bar :: missing fontset: %s\n", missing[n]);
+                fprintf(stderr, ":: bipolarbar :: missing fontset: %s\n", missing[n]);
 		XFreeStringList(missing);
 	}
 	if(font.fontset) {
@@ -117,10 +117,10 @@ void get_font() {
 		}
 		font.width = XmbTextEscapement(font.fontset, " ", 1);
 	} else {
-		fprintf(stderr, ":: Splitter_bar :: Font '%s' Not Found\n:: Splitter_bar :: Trying Font 'Fixed'\n", font_list);
+		fprintf(stderr, ":: bipolarbar :: Font '%s' Not Found\n:: bipolarbar :: Trying Font 'Fixed'\n", font_list);
 		if(!(font.font = XLoadQueryFont(dis, font_list))
 		&& !(font.font = XLoadQueryFont(dis, "fixed")))
-			fprintf(stderr, ":: Splitter_bar :: Error, cannot load font: '%s'\n", font_list);
+			fprintf(stderr, ":: bipolarbar :: Error, cannot load font: '%s'\n", font_list);
 		font.ascent = font.font->ascent;
 		font.descent = font.font->descent;
 		font.width = XTextWidth(font.font, " ", 1);
@@ -138,7 +138,7 @@ void update_output() {
     for(k=0;k<257;k++)
         output[k] = '\0';
     if(!(num = read(STDIN_FILENO, output, sizeof(output)))) {
-        fprintf(stderr, "Splitter_bar :: FAILED TO READ STDIN!!\n");
+        fprintf(stderr, "bipolarbar :: FAILED TO READ STDIN!!\n");
         strncpy(output, "FAILED TO READ STDIN!!", 24);
         exit(1);
     }
@@ -174,7 +174,7 @@ void update_right() {
     j=1;m=0; bg = 0;
 
     if(!(XFetchName(dis, root, &root_name))) {
-        strcpy(right, "&3splitter_bar ");
+        strcpy(right, "&1bipolarbar ");
         text_l = 14;
     } else {
         while(root_name[text_l] != '\0' && text_l < 256) {
@@ -310,7 +310,7 @@ unsigned long getcolor(const char* color) {
     Colormap map = DefaultColormap(dis,screen);
 
     if(!XAllocNamedColor(dis,map,color,&c,&c)) {
-        fprintf(stderr, "\033[0;31mSplitter_bar :: Error parsing color!");
+        fprintf(stderr, "\033[0;31mbipolarbar :: Error parsing color!");
         return 1;
     }
     return c.pixel;
@@ -325,7 +325,7 @@ int main(int argc, char ** argv){
     struct timeval tv;
 
     dis = XOpenDisplay(NULL);
-    if (!dis) {fprintf(stderr, "Splitter_bar :: unable to connect to display");return 7;}
+    if (!dis) {fprintf(stderr, "bipolarbar :: unable to connect to display");return 7;}
 
     root = DefaultRootWindow(dis);
     screen = DefaultScreen(dis);
@@ -333,7 +333,7 @@ int main(int argc, char ** argv){
     sh = XDisplayHeight(dis,screen);
     loc = setlocale(LC_ALL, "");
     if (!loc || !strcmp(loc, "C") || !strcmp(loc, "POSIX") || !XSupportsLocale())
-        fprintf(stderr, "Splitter_bar :: LOCALE FAILED\n");
+        fprintf(stderr, "bipolarbar :: LOCALE FAILED\n");
     get_font();
     height = (BAR_HEIGHT > font.height) ? BAR_HEIGHT : font.height+2;
     font.fh = ((height - font.height)/2) + font.ascent;
