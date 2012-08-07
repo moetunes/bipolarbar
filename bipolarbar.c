@@ -161,7 +161,8 @@ void update_output() {
     for(count=0;count<=text_length;count++) {
         print_text();
     }
-    XCopyArea(dis, winbar, barwin, theme[1].gc, 0, 0, new_length, height, 0, 0);
+    text_length = (old_length > new_length) ? old_length : new_length;
+    XCopyArea(dis, winbar, barwin, theme[1].gc, 0, 0, text_length, height, 0, 0);
     XSync(dis, False);
     old_length = new_length;
     return;
@@ -345,14 +346,15 @@ int main(int argc, char ** argv){
     XGCValues values;
 
     for(i=0;i<10;i++) {
+        values.background = theme[0].color;
         values.foreground = theme[i].color;
         values.line_width = 2;
         values.line_style = LineSolid;
         if(font.fontset) {
-            theme[i].gc = XCreateGC(dis, root, GCForeground|GCLineWidth|GCLineStyle,&values);
+            theme[i].gc = XCreateGC(dis, root, GCBackground|GCForeground|GCLineWidth|GCLineStyle,&values);
         } else {
             values.font = font.font->fid;
-            theme[i].gc = XCreateGC(dis, root, GCForeground|GCLineWidth|GCLineStyle|GCFont,&values);
+            theme[i].gc = XCreateGC(dis, root, GCBackground|GCForeground|GCLineWidth|GCLineStyle|GCFont,&values);
         }
     }
     old_length = 0;
