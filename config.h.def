@@ -1,0 +1,23 @@
+/* config.h for bipolarbar.c */
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#define TOP_BAR 0        // 0=Bar at top, 1=Bar at bottom
+#define BAR_HEIGHT 18
+#define BAR_WIDTH 0      // 0=Full width or use num pixels
+// If font isn't found "fixed" will be used
+#define FONT "-*-terminusmod.icons-medium-r-*-*-12-*-*-*-*-*-*-*,-*-stlarch-medium-r-*-*-12-*-*-*-*-*-*-*"
+#define FONTS_ERROR 1      // 0 to have missing fonts error shown
+// colours are for background and the text
+#define colour0 "#001020"  // &0 Default Background colour
+#define colour1 "#ffffff"   // &1 Default foreground colour
+#define colour2 "#002030"  // &2
+#define colour3 "#665522"
+#define colour4 "#898900"
+#define colour5 "#776644"
+#define colour6 "#887733"
+#define colour7 "#998866"
+#define colour8 "#999999"
+#define colour9 "#000055"  // &9
+
+#endif
