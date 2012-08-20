@@ -16,7 +16,6 @@
 */
 
 #include <X11/Xlib.h>
-#include <X11/Xutil.h>
 #include <X11/Xatom.h>
 #include <X11/Xlocale.h>
 
@@ -24,9 +23,7 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <string.h>
-#include <signal.h>
 #include <sys/select.h>
-#include <sys/time.h>
 #include <unistd.h>
 
 typedef struct {
@@ -51,7 +48,7 @@ static void get_font();
 static void update_right();
 static void print_text();
 static void print_right_text();
-static int wc_size(char *string, int num);
+static int wc_size(char *string, unsigned int num);
 
 static const char *defaultcolor[] = { colour0, colour1, colour2, colour3, colour4, colour5, colour6, colour7, colour8, colour9, };
 static const char *font_list = FONT;
@@ -59,17 +56,12 @@ static const char *font_list = FONT;
 static unsigned int count, counted, j, k, m, bg;
 static unsigned int text_length, text_start, new_length;
 static unsigned int old_length;
-static char output[256] = {"bipolarBar "};
-static char right[256] = {"You're ad here "};
+static char output[256];
+static char right[256];
 
 static Display *dis;
-static unsigned int sw;
-static unsigned int sh;
-static unsigned int height;
-static unsigned int width;
-static unsigned int screen;
-static Window root;
-static Window barwin;
+static unsigned int sw, sh, height, width, screen;
+static Window root, barwin;
 static Drawable winbar;
 
 static Iammanyfonts font;
@@ -93,10 +85,10 @@ void get_font() {
 
 		font.ascent = font.descent = 0;
 		n = XFontsOfFontSet(font.fontset, &xfonts, &font_names);
-		for(i = 0, font.ascent = 0, font.descent = 0; i < n; i++) {
+		for(i = 0, font.ascent = 0, font.descent = 0; i < n; ++i) {
 			if (font.ascent < (*xfonts)->ascent) font.ascent = (*xfonts)->ascent;
             if (font.descent < (*xfonts)->descent) font.descent = (*xfonts)->descent;
-			xfonts++;
+			++xfonts;
 		}
 		font.width = XmbTextEscapement(font.fontset, " ", 1);
 	} else {
@@ -112,23 +104,21 @@ void get_font() {
 }
 
 void update_output() {
-    j=1; k=0; bg = 0;
+    j=1; bg = count = k = 0;
     text_length = 0;
     unsigned int n;
     ssize_t num;
     char win_name[256];
 
-    for(k=0;k<257;k++)
-        output[k] = '\0';
+    memset(output, '\0', 256);
     if(!(num = read(STDIN_FILENO, output, sizeof(output)))) {
         fprintf(stderr, "bipolarbar :: FAILED TO READ STDIN!!\n");
         strncpy(output, "FAILED TO READ STDIN!!", 24);
         exit(1);
     }
 
-    count = 0; k = 0;
     text_length = strlen(output);
-    for(n=0;n<=text_length;n++) {
+    for(n=0;n<=text_length;++n) {
         while(output[n] == '&') {
             if(output[n+1]-'0' < 10 && output[n+1]-'0' >= 0)
                 n += 2;
@@ -137,11 +127,11 @@ void update_output() {
         }
         if(output[n] == '\n' || output[n] == '\r') break;
         win_name[count] = output[n];
-        count++;
+        ++count;
     }
     new_length = wc_size(win_name, count);
     XFillRectangle(dis, winbar, theme[0].gc, 0, 0, old_length, height);
-    for(count=0;count<=text_length;count++) {
+    for(count=0;count<=text_length;++count) {
         print_text();
     }
     text_length = (old_length > new_length) ? old_length : new_length;
@@ -163,7 +153,7 @@ void update_right() {
     } else {
         while(root_name[text_l] != '\0' && text_l < 256) {
             right[text_l] = root_name[text_l];
-            text_l++;
+            ++text_l;
         }
         right[text_l] = '\0';
     }
@@ -172,10 +162,10 @@ void update_right() {
     XFillRectangle(dis, winbar, theme[0].gc, old_length, 0, width-old_length, height);
     text_start = old_length+font.width;
     // i=pos on screen q=pos in text
-    for(counted=0;counted<=text_l;counted++) {
+    for(counted=0;counted<=text_l;++counted) {
         if(right[counted] == '&' && (right[counted+1] == 'C' || right[counted+1] == 'R')) {
             counted += 2; q=0; m=0;
-            for(n=counted;n<text_l;n++) {
+            for(n=counted;n<text_l;++n) {
                 while(right[n] == '&') {
                     if(right[n+1]-'0' < 10 && right[n+1]-'0' >= 0) {
                         n += 2;
@@ -185,7 +175,7 @@ void update_right() {
                         break;
                     } else break;
                 }
-                bstring[q] = right[n]; q++;
+                bstring[q] = right[n]; ++q;
             }
             bstring[q] = '\0';
             p_length = wc_size(bstring, q);
@@ -198,8 +188,7 @@ void update_right() {
     }
 
     XCopyArea(dis, winbar, barwin, theme[1].gc, old_length, 0, width-old_length, height, old_length, 0);
-    for(n=0;n<256;n++)
-        right[n] ='\0';
+    memset(right, '\0', 256);
     XSync(dis, False);
     return;
 }
@@ -223,11 +212,11 @@ void print_right_text() {
     }
     if(right[counted] == '&') {
         bstring[n] = right[counted];
-        n++;counted++;
+        ++n;++counted;
     }
     while(right[counted] != '&' && right[counted] != '\0' && right[counted] != '\n' && right[counted] != '\r') {
         bstring[n] = right[counted];
-        n++;counted++;
+        ++n;++counted;
     }
     if(n < 1) return;
     bstring[n] = '\0';
@@ -238,8 +227,7 @@ void print_right_text() {
     else
         XDrawString(dis, winbar, theme[j].gc, text_start+m, font.fh, bstring, n);
     m += wsize;
-    for(wsize=0;wsize<n;wsize++)
-        bstring[wsize] = '\0';
+    memset(bstring, '\0', n);
     counted--;
 }
 
@@ -258,11 +246,11 @@ void print_text() {
     }
     if(output[count] == '&') {
         astring[n] = output[count];
-        n++;count++;
+        ++n;++count;
     }
     while(output[count] != '&' && output[count] != '\0' && output[count] != '\n' && output[count] != '\r') {
         astring[n] = output[count];
-        n++;count++;
+        ++n;++count;
     }
     if(n < 1) return;
     astring[n] = '\0';
@@ -273,12 +261,11 @@ void print_text() {
     else
         XDrawString(dis, winbar, theme[j].gc, k, font.fh, astring, n);
     k += wsize;
-    for(wsize=0;wsize<n;wsize++)
-        astring[wsize] = '\0';
+    memset(astring, '\0', n);
     count--;
 }
 
-int wc_size(char *string, int num) {
+int wc_size(char *string, unsigned int num) {
     XRectangle rect;
 
     if(font.fontset) {
@@ -324,11 +311,11 @@ int main(int argc, char ** argv){
     width = (BAR_WIDTH == 0) ? sw : BAR_WIDTH;
     if (TOP_BAR != 0) y = sh - height;
 
-    for(i=0;i<10;i++)
+    for(i=0;i<10;++i)
         theme[i].color = getcolor(defaultcolor[i]);
     XGCValues values;
 
-    for(i=0;i<10;i++) {
+    for(i=0;i<10;++i) {
         values.background = theme[0].color;
         values.foreground = theme[i].color;
         values.line_width = 2;
