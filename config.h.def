@@ -6,7 +6,8 @@
 #define BAR_HEIGHT 18
 #define BAR_WIDTH 0      // 0=Full width or use num pixels
 // If font isn't found "fixed" will be used
-#define FONT "-*-terminusmod.icons-medium-r-*-*-12-*-*-*-*-*-*-*,-*-stlarch-medium-r-*-*-12-*-*-*-*-*-*-*"
+// #define FONT "-*-terminusmod.icons-medium-r-*-*-12-*-*-*-*-*-*-*,-*-stlarch-medium-r-*-*-12-*-*-*-*-*-*-*"
+#define FONT "-misc-fixed-medium-r-*-*-12-*-*-*-*-*-*-*"
 #define FONTS_ERROR 1      // 0 to have missing fonts error shown
 // colours are for background and the text
 #define colour0 "#001020"  // &0 Default Background colour
